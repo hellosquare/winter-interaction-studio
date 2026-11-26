@@ -78,3 +78,381 @@ function departAnimation(id){const d=demoStateFor(id);if(d.animating)return;d.co
 function attachDemo(id){const reset=$('#demo-reset');if(reset)reset.addEventListener('click',()=>{live[id]=null;demoStateFor(id);demoRefresh(id)});$$('[data-stamp]').forEach(btn=>btn.addEventListener('click',()=>{demoStateFor(id).stampType=btn.dataset.stamp;$$('[data-stamp]').forEach(t=>t.setAttribute('aria-pressed',String(t===btn)));}));attachSvgEvents(id)}
 function attachSvgEvents(id){const svg=$('#demo-svg');if(!svg)return;const d=demoStateFor(id);if(id==='toggle'&&d.gold)$$('.js-leaves',svg).forEach((node,i)=>node.setAttribute('fill',i===0?'#e9b966':'#f4d68c'));if(id==='palette')$('.js-wrap',svg).setAttribute('fill',['#c74b50','#4c8ba1','#ac77ab','#2f8e72'][d.idx]);if(['toggle','palette','reveal','move'].includes(id)){const target=$('[data-action]',svg);if(target){target.addEventListener('click',e=>{e.stopPropagation();demoAction(id,'click',e)});target.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();demoAction(id,'click',e)}})}}else if(id==='stamp'){svg.addEventListener('click',e=>demoAction(id,'click',e))}else if(id==='depart'){svg.style.cursor='pointer';svg.addEventListener('click',()=>demoAction(id,'click'))}else if(id==='hover'){const area=$('[data-action="hover"]',svg);area.addEventListener('mouseenter',()=>{d.hover=true;d.count++;const b=$('#hover-bubble',svg);if(b)b.style.display='block';updateStatus(id,route().step);const ct=$('#demo-count');if(ct)ct.textContent=`${d.count} interactions tried`});area.addEventListener('mouseleave',()=>{d.hover=false;const b=$('#hover-bubble',svg);if(b)b.style.display='none'});area.addEventListener('click',()=>{d.hover=!d.hover;if(d.hover)d.count++;const b=$('#hover-bubble',svg);if(b)b.style.display=d.hover?'block':'none';const ct=$('#demo-count');if(ct)ct.textContent=`${d.count} interactions tried`;updateStatus(id,route().step)})}else if(id==='drag'){const star=$('#drag-star',svg);let dragging=false,offsetX=0,offsetY=0,startX=0,startY=0;star.addEventListener('pointerdown',e=>{e.preventDefault();const pos=eventToSvg(svg,e);dragging=true;offsetX=pos.x-d.starX;offsetY=pos.y-d.starY;startX=pos.x;startY=pos.y;star.setPointerCapture(e.pointerId)});star.addEventListener('pointermove',e=>{if(!dragging)return;const pos=eventToSvg(svg,e);d.starX=Math.min(490,Math.max(30,pos.x-offsetX));d.starY=Math.min(297,Math.max(35,pos.y-offsetY));star.setAttribute('transform',`translate(${d.starX} ${d.starY})`)});star.addEventListener('pointerup',e=>{if(!dragging)return;dragging=false;const pos=eventToSvg(svg,e);if(Math.hypot(pos.x-startX,pos.y-startY)>8){d.count++;if(d.starX>285&&d.starX<450&&d.starY>38&&d.starY<230){d.dragged=true;d.starX=380;d.starY=60;}demoRefresh(id)}});star.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();d.dragged=true;d.starX=380;d.starY=60;d.count++;demoRefresh(id)}})}}
 window.addEventListener('DOMContentLoaded',render);
+
+/* === EXTRA STUDENT SUPPORT FOR LESSON 3 === */
+
+const TURTLE_HELP = {
+  toggle: {
+    tools: [
+      ["screen.onclick(change_tree)", "Run a function when the screen is clicked."],
+      ["pen.clear()", "Erase the old tree before redrawing."],
+      ["pen.fillcolor(colour)", "Set the fill colour for the next drawing."],
+      ["screen.update()", "Refresh when screen.tracer(0) is enabled."]
+    ],
+    tip: "Use a Boolean such as is_gold = False. Each click flips the state. Changing fillcolor alone does not recolour an existing drawing."
+  },
+
+  palette: {
+    tools: [
+      ["screen.onclick(next_colour)", "Call a function when the visitor clicks."],
+      ["colours[index]", "Read a colour from a list."],
+      ["(index + 1) % len(colours)", "Advance and return to the first colour."],
+      ["pen.clear()", "Erase the previous drawing before redrawing."]
+    ],
+    tip: "Keep colour_index outside the click function. If you assign to it inside the function, global colour_index is one way to update it."
+  },
+
+  stamp: {
+    tools: [
+      ["screen.onclick(add_snow)", "Receive x and y from the mouse click."],
+      ["effects_pen.goto(x, y)", "Move to the clicked coordinates."],
+      ['effects_pen.dot(12, "white")', "Draw a small white dot."],
+      ["effects_pen.clear()", "Erase only the marks made by this Turtle."]
+    ],
+    tip: "This feature may not need a global variable. Start with one click adding one mark, then create your own snowflake function."
+  },
+
+  reveal: {
+    tools: [
+      ["screen.onclick(open_present)", "Run a function when the screen is clicked."],
+      ["if opened: / else:", "Decide which version to display."],
+      ["pen.clear()", "Erase the previous drawing."],
+      ["screen.update()", "Show changes if tracer(0) is enabled."]
+    ],
+    tip: "Try opened = False. When the visitor clicks, change that value and redraw the gift or surprise."
+  },
+
+  move: {
+    tools: [
+      ["screen.onclick(move_object)", "Detect the visitor's click."],
+      ["pen.goto(x, y)", "Move a Turtle to a coordinate."],
+      ["pen.setx(new_x)", "Change a Turtle's x-coordinate."],
+      ["pen.clear()", "Erase an old drawing before redrawing."]
+    ],
+    tip: "Moving the pen does not move lines already drawn on the screen. You need to clear and redraw the object, or move a visible Turtle shape."
+  },
+
+  depart: {
+    tools: [
+      ["screen.onclick(toggle_trip)", "Allow clicks even when the object is off-screen."],
+      ["screen.ontimer(step, 30)", "Schedule another animation step after 30 ms."],
+      ["pen.goto(x, y)", "Move a Turtle to a new position."],
+      ["screen.update()", "Display each animation frame."]
+    ],
+    tip: "Use a Boolean such as is_away. First click moves the object beyond the edge; second click returns it to the starting position."
+  },
+
+  drag: {
+    tools: [
+      ["gift.ondrag(drag_gift)", "Call a function while dragging a visible Turtle."],
+      ["def drag_gift(x, y):", "Receive mouse coordinates."],
+      ["gift.goto(x, y)", "Move the Turtle toward the cursor."],
+      ["gift.onrelease(drop_gift)", "Run a function when the mouse is released."]
+    ],
+    tip: "Start by dragging a visible Turtle cursor. Dragging a shape drawn by a hidden pen requires a different approach."
+  },
+
+  hover: {
+    tools: [
+      ["pen.onclick(show_secret)", "Click a visible Turtle shape."],
+      ["screen.onclick(show_secret)", "Click inside a coordinate region."],
+      ['screen.onkey(show_secret, "h")', "Reveal something using the H key."],
+      ["screen.listen()", "Enable keyboard events."]
+    ],
+    tip: "Standard Turtle does not have a built-in onhover() method. True hovering requires advanced Tkinter event handling. Clicking or pressing a key is easier."
+  }
+};
+
+// Tiny examples that introduce events without solving the project
+function basicEventExample(id) {
+  if (id === "drag") {
+    return `def follow_mouse(x, y):
+    gift.goto(x, y)
+
+gift.ondrag(follow_mouse)`;
+  }
+
+  if (id === "hover") {
+    return `def show_message():
+    print("Hello!")
+
+screen.onkey(show_message, "h")
+screen.listen()`;
+  }
+
+  return `def test_click(x, y):
+    print("Clicked at:", round(x), round(y))
+
+screen.onclick(test_click)`;
+}
+
+// Create five gradual hints
+function extraHint(id, level) {
+  const s = SKILLS[id];
+  const help = TURTLE_HELP[id];
+
+  const labels = [
+    "THINK",
+    "USEFUL METHODS",
+    "TRY A TINY EXAMPLE",
+    "STATE & DEBUG",
+    "UNFINISHED STARTER"
+  ];
+
+  let content = "";
+
+  if (level === 1) {
+    content = `<p>${esc(s.hint1)}</p>`;
+  }
+
+  if (level === 2) {
+    content = `<p>${esc(s.hint2)}</p>`;
+  }
+
+  if (level === 3) {
+    content = `
+      <p>Try this small experiment first. What does each line do?</p>
+      <pre>${esc(basicEventExample(id))}</pre>
+      <p>Notice how the event is connected to a function.</p>
+    `;
+  }
+
+  if (level === 4) {
+    content = `
+      <p>${esc(help.tip)}</p>
+      <p>
+        <strong>What is global?</strong>
+        If you assign a new value to a variable defined outside
+        a function, global variable_name tells Python to update
+        that outside variable. You don't need global just to read it.
+      </p>
+      <p>
+        <strong>Debug:</strong>
+        Does the event function run? Try a print statement.
+        If you use tracer(0), did you call screen.update()?
+      </p>
+    `;
+  }
+
+  if (level === 5) {
+    content = `
+      <pre>${esc(s.hint3)}</pre>
+      <p>
+        Complete the missing conditions, coordinates
+        and drawing instructions yourself.
+      </p>
+    `;
+  }
+
+  return `
+    <div class="hint-card">
+      <b>HINT ${level} / ${labels[level - 1]}</b>
+      ${content}
+    </div>
+  `;
+}
+
+// Add a Turtle interaction lesson to Build & Debug
+const previousLessonThree = lessonThree;
+
+lessonThree = function (skill, id, record) {
+  let html = previousLessonThree(skill, id, record);
+  const help = TURTLE_HELP[id];
+
+  if (!help) return html;
+
+  const methodCards = help.tools.map(([method, meaning]) => `
+    <div class="winter-tool">
+      <code>${esc(method)}</code>
+      <span>${esc(meaning)}</span>
+    </div>
+  `).join("");
+
+  const basics = `
+    <div class="activity">
+
+      <h3>Before coding: How does Turtle detect an interaction?</h3>
+
+      <p>
+        <strong>Event → Function → Visible change.</strong>
+        A click calls a function. That function can check a
+        condition, change a value, and redraw an object.
+      </p>
+
+      <details class="winter-expand">
+        <summary>Show me how screen.onclick() works</summary>
+        <pre>${esc(`def check_click(x, y):
+    print(x, y)
+
+screen.onclick(check_click)`)}</pre>
+        <p>
+          Turtle supplies x and y. Write check_click,
+          not check_click(), when registering the event.
+        </p>
+      </details>
+
+      <details class="winter-expand">
+        <summary>What is a state variable? What does global mean?</summary>
+        <p>
+          A state variable remembers something between clicks.
+          For example: <code>light_on = False</code>.
+        </p>
+        <p>
+          If your function changes that outside variable,
+          use <code>global light_on</code>.
+          To switch a Boolean, use
+          <code>light_on = not light_on</code>.
+        </p>
+      </details>
+
+      <h3>Methods you could use</h3>
+
+      <div class="winter-tools">
+        ${methodCards}
+      </div>
+
+      <p>
+        <strong>Think:</strong>
+        Which two methods would help your own pseudocode?
+        You don't need to use every method here.
+      </p>
+
+    </div>
+  `;
+
+  html = html.replace(
+    '<div class="activity"><h3>02. Try without hints first',
+    basics + '<div class="activity"><h3>02. Try without hints first'
+  );
+
+  // Replace the old three-hint area with five hints
+  const begin = html.indexOf('<div id="hints">');
+  const end = html.indexOf('<div class="code-caution">', begin);
+
+  if (begin >= 0 && end >= 0) {
+    const count = Math.min(5, live["hints-" + id] || 0);
+
+    const hints = Array.from(
+      { length: count },
+      (_, i) => extraHint(id, i + 1)
+    ).join("");
+
+    const nextButton = count < 5
+      ? `<button type="button" class="hint-button"
+          id="winter-next-hint">
+          Reveal hint ${count + 1} ＋
+        </button>`
+      : "";
+
+    html =
+      html.slice(0, begin) +
+      `<div id="hints">${hints}</div>${nextButton}` +
+      html.slice(end);
+  }
+
+  return html;
+};
+
+// Connect the new hint button
+const previousAttachLesson = attachLesson;
+
+attachLesson = function (id, step) {
+  previousAttachLesson(id, step);
+
+  const button = document.getElementById("winter-next-hint");
+  if (!button) return;
+
+  button.addEventListener("click", () => {
+    const next = Math.min(
+      5,
+      (live["hints-" + id] || 0) + 1
+    );
+
+    live["hints-" + id] = next;
+
+    document.getElementById("hints").insertAdjacentHTML(
+      "beforeend",
+      extraHint(id, next)
+    );
+
+    if (next === 5) {
+      button.remove();
+    } else {
+      button.textContent = `Reveal hint ${next + 1} ＋`;
+    }
+  });
+};
+
+// Style the new help panels
+const winterHelpStyle = document.createElement("style");
+
+winterHelpStyle.textContent = `
+.winter-expand {
+  border: 1px solid #d9dfd6;
+  border-radius: 12px;
+  padding: 12px 15px;
+  margin: 12px 0;
+  background: #f8faf5;
+}
+
+.winter-expand summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: #245647;
+}
+
+.winter-expand p {
+  margin: 12px 0 2px;
+}
+
+.winter-expand pre,
+.hint-card pre {
+  font: 14px/1.65 Consolas, monospace;
+  white-space: pre;
+  overflow-x: auto;
+  max-width: 100%;
+  background: #20342d;
+  color: white;
+  border-radius: 10px;
+  padding: 15px;
+}
+
+.winter-tools {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.winter-tool {
+  min-width: 0;
+  padding: 14px;
+  background: #edf5ef;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.winter-tool code {
+  font-size: 14px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  color: #255948;
+}
+
+.winter-tool span {
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+@media (max-width: 650px) {
+  .winter-tools {
+    grid-template-columns: 1fr;
+  }
+}
+`;
+
+document.head.appendChild(winterHelpStyle);
+
+/* === END EXTRA STUDENT SUPPORT === */
