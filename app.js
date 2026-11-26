@@ -532,3 +532,399 @@ winterHelpStyle.textContent = `
 document.head.appendChild(winterHelpStyle);
 
 /* === END EXTRA STUDENT SUPPORT === */
+/* BEGIN: Beginner mini-labs for Turtle Winter Project.
+   Paste after the existing app.js code. No other files to edit. */
+const MINI_LABS = {
+  toggle: {
+    headline: 'Make a click work before changing a tree',
+    note: 'Your existing draw_tree(tree_points) function can stay exactly as it is. A second pen can draw a new colour over the leaves.',
+    steps: [
+      ['1. Detect one click', 'Add this above turtle.done(). Run your scene and click anywhere. Look in the VS Code terminal.',
+`def test_click(x, y):
+    print("Clicked!", round(x), round(y))
+
+screen.onclick(test_click)`,
+'Can you see the word Clicked? If not, check the function name and the () on onclick().'],
+      ['2. Draw gold on a separate pen', 'Replace your test_click function with this experiment. It adds one gold circle without changing your original tree.',
+`gold_pen = turtle.Turtle()
+gold_pen.hideturtle()
+gold_pen.penup()
+
+def change_tree(x, y):
+    gold_pen.goto(100, 40)  # Change this position
+    gold_pen.dot(60, "gold")
+    screen.update()        # For tracer(0)
+
+screen.onclick(change_tree)`,
+'Click once. Does a gold dot appear? Later, replace the dot with your own tree-leaf drawing instructions.'],
+      ['3. Make the second click undo it', 'Now remember whether the gold overlay is showing. Keep gold_pen from Step 2; replace only your change_tree function.',
+`gold_on = False
+
+def change_tree(x, y):
+    global gold_on
+    gold_on = not gold_on    # Switch Yes / No
+    gold_pen.clear()        # Remove old gold marks
+    if gold_on:
+        gold_pen.goto(100, 40)
+        gold_pen.dot(60, "gold")
+    screen.update()
+
+screen.onclick(change_tree)`,
+'First click: gold appears. Second click: gold disappears. "global" lets the function change gold_on between clicks. Next: trace your own leaf coordinates using gold_pen.']
+    ]
+  },
+  palette: {
+    headline: 'Use a colour list, one idea at a time',
+    note: 'Start by printing colour names. Do not try to recolour your finished present yet.',
+    steps: [
+      ['1. Make a colour list', 'Choose three colours. Does the list have index 0, 1 and 2?',
+`colours = ["red", "blue", "gold"]
+print(colours[0])
+print(colours[1])`,
+'Try changing the list to your own hexadecimal colour codes.'],
+      ['2. Move to the next colour on a click', 'Add this beneath the list. Print the next colour each time.',
+`colour_number = 0
+
+def next_colour(x, y):
+    global colour_number
+    colour_number = colour_number + 1
+    if colour_number == len(colours):
+        colour_number = 0
+    print(colours[colour_number])
+
+screen.onclick(next_colour)`,
+'After three clicks, does it return to the first colour? The if statement prevents an index error.'],
+      ['3. Test your colours with one dot', 'Add a separate pen. Inside next_colour, after print(), add the three lines shown below.',
+`test_pen = turtle.Turtle()
+test_pen.hideturtle()
+test_pen.penup()
+
+def draw_colour_dot(chosen_colour):
+    test_pen.clear()
+    test_pen.goto(0, 50)
+    test_pen.dot(80, chosen_colour)
+    screen.update()
+
+# ADD this call inside next_colour():
+# draw_colour_dot(colours[colour_number])`,
+'Once the dot works, replace it with YOUR existing present-drawing instructions. A colour change needs a redraw.']
+    ]
+  },
+  stamp: {
+    headline: 'Make a mark exactly where the visitor clicks',
+    note: 'This is a good first interaction because it does not need an if statement or a global variable.',
+    steps: [
+      ['1. Find the click position', 'Try printing the x and y values supplied by Turtle.',
+`def find_click(x, y):
+    print(round(x), round(y))
+
+screen.onclick(find_click)`,
+'Click the four corners. What changes: x, y, or both?'],
+      ['2. Add a snow dot', 'Replace find_click with this function. A separate pen keeps snow independent from the background.',
+`snow_pen = turtle.Turtle()
+snow_pen.hideturtle()
+snow_pen.penup()
+
+def add_snow(x, y):
+    snow_pen.goto(x, y)
+    snow_pen.dot(12, "white")
+    screen.update()
+
+screen.onclick(add_snow)`,
+'Click three different places. Each click should leave a new dot.'],
+      ['3. Only let snow appear in the sky', 'Edit add_snow to add this condition. Decide where the sky ends in your own scene.',
+`def add_snow(x, y):
+    if y > 0:             # Change this boundary
+        snow_pen.goto(x, y)
+        snow_pen.dot(12, "white")
+        screen.update()`,
+'Now replace dot() with your own draw_snowflake(x, y) function, if you have one.']
+    ]
+  },
+  reveal: {
+    headline: 'Show a surprise, then hide it again',
+    note: 'Keep the surprise on its own pen. This lets you erase it without removing the rest of the scene.',
+    steps: [
+      ['1. Test the gift click', 'For your first test, a click anywhere will work. Checking the exact gift area comes later.',
+`def test_gift(x, y):
+    print("Gift clicked!")
+
+screen.onclick(test_gift)`,
+'Can you see Gift clicked! in the terminal?'],
+      ['2. Make a surprise appear', 'Replace the test function with this short example.',
+`surprise_pen = turtle.Turtle()
+surprise_pen.hideturtle()
+surprise_pen.penup()
+
+def show_surprise(x, y):
+    surprise_pen.goto(0, 80)
+    surprise_pen.dot(60, "gold")
+    screen.update()
+
+screen.onclick(show_surprise)`,
+'Click once. After this works, swap the dot for your own snowman, star or gift drawing.'],
+      ['3. Click again to hide it', 'Keep surprise_pen from Step 2. Replace show_surprise with this function.',
+`gift_open = False
+
+def show_surprise(x, y):
+    global gift_open
+    gift_open = not gift_open
+    surprise_pen.clear()
+    if gift_open:
+        surprise_pen.goto(0, 80)
+        surprise_pen.dot(60, "gold")
+    screen.update()
+
+screen.onclick(show_surprise)`,
+'The second click removes the surprise. Later, add an if statement to check whether the gift itself was clicked.']
+    ]
+  },
+  move: {
+    headline: 'Move a visible Turtle before moving a drawing',
+    note: 'goto() moves the Turtle cursor; it does not move polygons previously drawn by another pen.',
+    steps: [
+      ['1. Create something movable', 'Try a built-in Turtle shape first.',
+`moving = turtle.Turtle()
+moving.shape("circle")
+moving.color("gold")
+moving.penup()
+moving.goto(-150, -50)`,
+'Why do we use penup()? It prevents a trail.'],
+      ['2. Move it when clicked', 'Add a click function. This moves the visible circle to the right.',
+`def move_right(x, y):
+    moving.goto(150, -50)
+    screen.update()
+
+screen.onclick(move_right)`,
+'Does the circle move when you click? No state variable needed yet.'],
+      ['3. Click again to move back', 'Replace move_right with the new two-position function.',
+`moved = False
+
+def move_right(x, y):
+    global moved
+    moved = not moved
+    if moved:
+        moving.goto(150, -50)
+    else:
+        moving.goto(-150, -50)
+    screen.update()
+
+screen.onclick(move_right)`,
+'To move your own hand-drawn sleigh, draw it with a separate pen, clear it, and redraw it in the new location.']
+    ]
+  },
+  depart: {
+    headline: 'Send an object past the edge, then bring it back',
+    note: 'Make the object disappear instantly first. Smooth animation is an optional second challenge.',
+    steps: [
+      ['1. Create a test sleigh marker', 'Use a visible shape as a placeholder. The standard 900 × 600 screen is roughly x = -450 to +450.',
+`sleigh = turtle.Turtle()
+sleigh.shape("triangle")
+sleigh.color("red")
+sleigh.penup()
+sleigh.goto(-150, -50)`,
+'Can you see your red triangle at the starting position?'],
+      ['2. Send it outside the screen', 'Register the click on screen, not on sleigh. Otherwise the next click would be impossible after it disappears.',
+`def fly_away(x, y):
+    sleigh.goto(600, -50)
+    screen.update()
+
+screen.onclick(fly_away)`,
+'Does it leave the frame when you click?'],
+      ['3. Second click brings it home', 'Replace fly_away with this version. The variable remembers whether it is outside.',
+`away = False
+
+def fly_away(x, y):
+    global away
+    away = not away
+    if away:
+        sleigh.goto(600, -50)
+    else:
+        sleigh.goto(-150, -50)
+    screen.update()
+
+screen.onclick(fly_away)`,
+'Adaptation: hand-drawn objects must be cleared and redrawn. Advanced students can use ontimer() for gradual movement.']
+    ]
+  },
+  drag: {
+    headline: 'Drag a real Turtle shape',
+    note: 'Begin with the built-in Turtle cursor. An old rectangle or star drawn by a hidden pen is not automatically draggable.',
+    steps: [
+      ['1. Make an object that can be moved', 'Start a small practice file or add this ABOVE turtle.done().',
+`star = turtle.Turtle()
+star.shape("turtle")     # Try "circle" later
+star.color("blue")
+star.speed("fast")
+star.penup()             # No drawing trail`,
+'Run the file. Is there a visible Turtle shape to grab?'],
+      ['2. Write one drag function', 'Turtle supplies x and y as the mouse moves. Your function tells the object to follow.',
+`def follow_mouse(x, y):
+    star.goto(x, y)
+    screen.update()
+
+star.ondrag(follow_mouse)`,
+'Click and HOLD on the Turtle, then move your mouse. This is different from screen.onclick().'],
+      ['3. Drop it near a destination (optional)', 'Only after dragging works, add a release function.',
+`def drop_star(x, y):
+    if y > 0:
+        star.goto(0, 120)  # Snap to tree top
+
+star.onrelease(drop_star)`,
+'Change the destination to your tree. For a custom draggable image, you need a registered Turtle shape—advanced work.']
+    ]
+  },
+  hover: {
+    headline: 'Start with reveal-on-click; hover is advanced',
+    note: 'Python Turtle has no built-in onhover() method. You can still create the same visitor experience with a click or key.',
+    steps: [
+      ['1. Detect a click on the scene', 'Start by printing a simple confirmation.',
+`def show_clue(x, y):
+    print("You found a clue!")
+
+screen.onclick(show_clue)`,
+'If this works, you have a usable interaction for younger visitors.'],
+      ['2. Make a clue appear', 'Show one small clue with a separate pen.',
+`clue_pen = turtle.Turtle()
+clue_pen.hideturtle()
+clue_pen.penup()
+
+def show_clue(x, y):
+    clue_pen.goto(0, 110)
+    clue_pen.write("Hello!", align="center")
+    screen.update()
+
+screen.onclick(show_clue)`,
+'Use clue_pen.clear() to remove only the clue. This is an achievable replacement for hover.'],
+      ['3. Add a keyboard control', 'Keep your show_clue function. Add a second function to hide the clue with the space bar.',
+`def hide_clue():
+    clue_pen.clear()
+    screen.update()
+
+screen.onkey(hide_clue, "space")
+screen.listen()`,
+'True mouse-hover requires Tkinter mouse-motion binding and coordinate conversion. It is optional, not a beginner requirement.']
+    ]
+  }
+};
+
+function miniLabMarkup(id) {
+  const lab = MINI_LABS[id];
+  if (!lab) return '';
+  const r = record(id);
+  const n = Math.max(0, Math.min(3, r.miniStep || 0));
+  const steps = lab.steps;
+  r.miniResponses ||= ['', '', ''];
+  const cards = steps.map((step, i) => {
+    const visible = i === n || (n === 3 && i === 2);
+    return `<div class="mini-step ${i < n ? 'mini-finished' : ''} ${visible ? 'mini-current' : ''}">
+      <div class="mini-step-head"><span class="mini-num">${i < n ? '✓' : i + 1}</span><strong>${esc(step[0])}</strong></div>
+      ${visible ? `<div class="mini-step-body">
+        <p>${esc(step[1])}</p>
+        <pre>${esc(step[2])}</pre>
+        <p class="mini-test"><strong>TEST IT:</strong> ${esc(step[3])}</p>
+        <label for="mini-answer" class="mini-answer-label">What happened when you ran your code?</label>
+        <textarea id="mini-answer" class="mini-answer" rows="2" placeholder="I tested it and noticed...">${esc(r.miniResponses[i] || '')}</textarea>
+        <p id="mini-answer-error" class="mini-error" role="alert"></p>
+        ${n < 3 ? `<button type="button" class="mini-advance" data-mini-next="${i + 1}">I tested this. Next step →</button>` : `<span class="mini-done-note">Practice finished. Now adapt this to your winter scene.</span>`}
+      </div>` : (i < n ? `<p class="mini-revisit">Tested. <button type="button" data-mini-back="${i}">Review</button></p>` : '<p class="mini-locked">Complete the step above to open this one.</p>')}
+    </div>`;
+  }).join('');
+  const treeExtra = id === 'toggle' && n === 3 ? `<details class="mini-reference"><summary>Extra help: My trees use coordinate lists. What replaces the gold dot?</summary><p>Inside your existing <code>if gold_on:</code> block, you can trace the leaf points instead of calling <code>dot()</code>. This draws gold over the original green without changing <code>draw_tree(tree_points)</code>.</p><pre>${esc(`leaves = tree_1[1]  # Tree leaves, not trunk
+gold_pen.goto(leaves[0])
+gold_pen.pendown()
+gold_pen.color("gold")
+gold_pen.begin_fill()
+for point in leaves:
+    gold_pen.goto(point)
+gold_pen.goto(leaves[0])
+gold_pen.end_fill()
+gold_pen.penup()` )}</pre><p>Try it with one tree first. For all four trees, repeat with the other leaf lists or explore a for loop.</p></details>` : '';
+  return `<section id="beginner-minilab" class="beginner-minilab" aria-label="Step-by-step coding practice">
+    <div class="mini-kicker">GUIDED PYTHON PRACTICE · 3 SMALL TESTS</div>
+    <h3>${esc(lab.headline)}</h3><p>${esc(lab.note)}</p>
+    <div class="mini-rule"><strong>How to use the code:</strong> Your project should already have <code>import turtle</code> and <code>screen = turtle.Screen()</code>. Add each experiment <em>before</em> <code>turtle.done()</code>. <strong>Replace</strong> the previous event handler when moving to the next step; do not register multiple competing <code>screen.onclick()</code> functions. Keep your original winter drawing saved.</div>
+    ${cards}
+    ${n === 3 ? `<div class="mini-final"><strong>YOUR TURN:</strong> What will you change in this example so it works with your own ${esc(SKILLS[id].title.toLowerCase())}? Test it in VS Code, then use the lesson checklist below.</div>` : ''}
+    ${treeExtra}
+  </section>`;
+}
+
+// Swap only the long Lesson 3 introduction for interactive micro-lessons.
+const priorWinterLessonThree = lessonThree;
+lessonThree = function(s, id, r) {
+  let html = priorWinterLessonThree(s, id, r);
+  const oldBasics = eventBasics(id);
+  const newBasics = miniLabMarkup(id) +
+    `<details class="mini-reference"><summary>Optional: Turtle event and method reference</summary>${oldBasics}</details>`;
+  if (html.includes(oldBasics)) html = html.replace(oldBasics, newBasics);
+  return html;
+};
+
+// One click listener works even after the lesson is rerendered.
+document.addEventListener('click', e => {
+  const next = e.target.closest('[data-mini-next]');
+  const back = e.target.closest('[data-mini-back]');
+  if (!next && !back) return;
+  const routeInfo = route();
+  if (routeInfo.home || routeInfo.step !== 3) return;
+  const r = record(routeInfo.id);
+  r.miniResponses ||= ['', '', ''];
+  if (next) {
+    const answer = document.getElementById('mini-answer')?.value.trim() || '';
+    if (answer.length < 8) {
+      const error = document.getElementById('mini-answer-error');
+      if (error) error.textContent = 'First, write a short sentence about what happened when you tested the code.';
+      return;
+    }
+    r.miniResponses[Number(next.dataset.miniNext) - 1] = answer;
+  }
+  r.miniStep = Number(next ? next.dataset.miniNext : back.dataset.miniBack);
+  save();
+  const node = document.getElementById('beginner-minilab');
+  if (node) node.outerHTML = miniLabMarkup(routeInfo.id);
+});
+document.addEventListener('input', e => {
+  if (e.target.id !== 'mini-answer') return;
+  const current = route();
+  if (current.home || current.step !== 3) return;
+  const r = record(current.id);
+  r.miniResponses ||= ['', '', ''];
+  r.miniResponses[Math.min(2, r.miniStep || 0)] = e.target.value;
+  save();
+});
+
+const beginnerLabStyles = document.createElement('style');
+beginnerLabStyles.textContent = `
+.beginner-minilab{margin:18px 0 30px;padding:24px;background:#edf5ef;border:1px solid #cadecf;border-radius:20px;color:#18362b}
+.mini-kicker{color:#8a423b;font-size:12px;font-weight:800;letter-spacing:.13em}
+.beginner-minilab h3{font-size:clamp(22px,2.8vw,31px);line-height:1.2;margin:10px 0}
+.beginner-minilab>p{font-size:16px;line-height:1.6;margin:0 0 17px}
+.mini-rule{background:#fffdf6;border:1px solid #e7dbc3;border-radius:12px;padding:15px 17px;font-size:14px;line-height:1.6;margin-bottom:18px}
+.mini-rule code{font-size:13px;background:#f3eadb;padding:2px 4px;border-radius:4px}
+.mini-step{background:white;border:1px solid #dae5dc;border-radius:13px;margin-top:11px;overflow:hidden}
+.mini-current{border:2px solid #317e64;box-shadow:0 8px 24px rgba(31,83,65,.08)}
+.mini-step-head{display:flex;align-items:center;gap:12px;padding:15px 17px;font-size:16px;color:#1c4033}
+.mini-num{display:inline-grid;place-items:center;flex:none;border-radius:50%;height:30px;width:30px;background:#e7f2ea;font-weight:900;font-size:13px}
+.mini-current .mini-num{background:#267257;color:white}
+.mini-step-body{padding:0 17px 18px}
+.mini-step-body>p{margin:3px 0 13px;line-height:1.55;font-size:15px}
+.mini-step-body pre{display:block;width:100%;overflow:auto;margin:12px 0;background:#172c27;color:#f5f8f1;border-radius:12px;padding:16px;font:14px/1.65 'Consolas','Courier New',monospace;white-space:pre;tab-size:4}
+.mini-step-body .mini-test{padding:13px;background:#fff8e9;border-left:4px solid #c9a154;border-radius:7px}
+.mini-answer-label{display:block;font-size:14px;font-weight:750;margin:10px 0 6px;color:#214a3a}
+.mini-answer{display:block;width:100%;box-sizing:border-box;border:1px solid #b9cbbd;background:#fcfffd;color:#18362b;padding:12px;border-radius:9px;font-size:15px;line-height:1.5;font-family:inherit;resize:vertical}
+.mini-error{font-size:13px;color:#a13737;margin:5px 0;min-height:2px}
+.mini-advance{background:#a74245;color:white;border:0;padding:12px 18px;border-radius:9px;cursor:pointer;font-size:14px;font-weight:800}
+.mini-advance:hover{background:#813234}
+.mini-locked,.mini-revisit{margin:0;padding:0 18px 14px;font-size:13px;color:#687d70}
+.mini-revisit button{border:0;background:transparent;text-decoration:underline;color:#267257;cursor:pointer;font-weight:700}
+.mini-final{padding:15px 17px;margin-top:14px;background:#fff3d5;border:1px solid #e6c780;border-radius:12px;line-height:1.55}
+.mini-done-note{font-weight:700;color:#217051}
+.mini-reference{margin:10px 0 20px;border:1px solid #d6e1d9;border-radius:12px;padding:12px 17px}
+.mini-reference>summary{font-weight:800;cursor:pointer;color:#276951}
+.mini-reference>.activity{margin-top:18px}
+@media(max-width:650px){.beginner-minilab{padding:16px}.mini-step-body pre{font-size:12px;padding:12px}.mini-step-head{font-size:15px}}
+`;
+document.head.appendChild(beginnerLabStyles);
+/* END beginner mini-labs. */
+
