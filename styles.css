@@ -11,3 +11,53 @@ main{min-height:calc(100vh - 156px)}.wrap{max-width:1250px;padding:0 28px;margin
 @media(max-width:760px){.site-header{padding:14px 18px;min-height:70px}.brand{font-size:15px}.brand small{font-size:8px}.brand-mark{width:34px;height:34px}.brand-mark svg{width:23px}.course-chip{display:none}.header-progress{font-size:11px}.wrap{padding-left:18px;padding-right:18px}.hero-grid{grid-template-columns:1fr;gap:34px;min-height:auto;padding-top:47px;padding-bottom:60px}.hero-copy h1{font-size:clamp(40px,9vw,59px)}.hero-copy p{font-size:16px}.hero-art{max-width:490px;justify-self:center;width:95%}.hero-art .floating-note{right:-7px}.section-top{align-items:flex-start;flex-direction:column}.path-progress{width:100%}.lesson-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.skill-title{font-size:18px}.card-art{height:115px}.skill-card-content{padding:16px}.how-section{grid-template-columns:1fr}.workspace-grid{grid-template-columns:1fr}.demo-panel{position:static;grid-row:1}.lesson-panel{grid-row:2;padding:23px 20px}.lesson-head{align-items:flex-start;flex-direction:column}.stages{gap:7px}.stage{padding:8px;min-height:64px;gap:6px}.stage.active{padding:7px}.stage .stage-icon{width:29px;height:29px;border-radius:9px;font-size:12px}.stage small{font-size:9px}.stage strong{font-size:12px}.site-footer{padding:18px;flex-direction:column;align-items:flex-start;font-size:11px}.demo-stage svg{max-height:none}}
 @media(max-width:460px){.lesson-grid{grid-template-columns:1fr}.skill-card{min-height:0;display:grid;grid-template-columns:116px 1fr}.card-art{height:100%;min-height:175px}.skill-card-content{padding:16px}.card-bottom{margin-top:8px}.how-steps{grid-template-columns:1fr}.how-section{padding:20px}.section-top h2{font-size:32px}.course-chip{display:none}.stages{grid-template-columns:repeat(3,1fr)}.stage{justify-content:center}.stage .stage-icon{display:none}.stage strong{font-size:11px}.stage small{font-size:9px}.prompt-grid{grid-template-columns:1fr}.lesson-panel h2{font-size:30px}.hero-art .floating-label{font-size:11px}.demo-top{padding:17px 17px 12px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* Project title fits the existing header on desktop and mobile. */
+.brand-title{display:block;font-family:var(--display);font-size:16px;font-weight:700;line-height:1.18;letter-spacing:-.035em;max-width:435px}
+.brand-title small{letter-spacing:.12em;font-size:10px}
+@media(max-width:760px){
+  .site-header{gap:9px}
+  .brand{gap:8px;min-width:0}
+  .brand-title{font-size:12px;max-width:240px}
+  .brand-title small{font-size:8px}
+  .header-right{gap:6px;min-width:0}
+  .header-progress{font-size:10px}
+}
+@media(max-width:470px){
+  .brand-title{font-size:11px;max-width:205px}
+  .brand-title small{display:none}
+  .header-progress{font-size:9px;max-width:100px;text-align:right;white-space:normal}
+}
+
+/* Guided build additions: event walkthrough, method reference, progressive hints. */
+.activity-basics { padding-bottom: 22px; }
+.event-steps{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:18px 0 13px}
+.event-steps>div{flex:1;min-width:105px;display:flex;align-items:center;gap:9px;background:#edf5ee;border:1px solid #ceded2;padding:12px;border-radius:14px}
+.event-steps>div>b{border-radius:50%;width:25px;height:25px;flex-shrink:0;display:grid;place-items:center;background:#1c5d49;color:white;font-size:12px}
+.event-steps>div>span{font-weight:700;font-size:13px;line-height:1.35}
+.event-steps>span{color:#b1874a}
+.learn-detail{border:1px solid #d6e0d7;background:#fbfdf9;border-radius:15px;margin-top:11px;overflow:hidden}
+.learn-detail summary{cursor:pointer;padding:14px 17px;font-weight:750;color:#184b3f;display:flex;align-items:center;justify-content:space-between;gap:12px;list-style:none;font-size:15px}
+.learn-detail summary::-webkit-details-marker{display:none}
+.learn-detail[open] summary{border-bottom:1px solid #d6e0d7}
+.learn-detail summary span{font-size:18px;color:#9a6f30;font-weight:500}
+.detail-inside{padding:15px 18px 18px}
+.detail-inside p{margin:0 0 13px}
+.detail-inside p:last-child{margin-bottom:0}
+.detail-inside pre,.hint-card pre{font:500 13px/1.7 ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;white-space:pre;overflow-x:auto;max-width:100%;background:#172e29;color:#f7f9f7;border-radius:12px;padding:15px 17px;margin:12px 0}
+.detail-inside code,.hint-card p code,.tool-card code{font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace}
+.detail-inside p code,.hint-card p code{background:#e8efe7;padding:1px 5px;border-radius:5px;color:#175541}
+.tool-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:18px 0}
+.tool-card{min-width:0;display:flex;flex-direction:column;gap:8px;background:#f5f7f3;border:1px solid #dce4d9;border-radius:12px;padding:13px}
+.tool-card code{color:#2a5b47;font-size:12px;font-weight:800;overflow-wrap:anywhere;white-space:normal}
+.tool-card span{color:#4c6159;font-size:13px;line-height:1.4}
+.small-reminder{border-left:3px solid #dca85b;background:#fbf6e9;border-radius:0 10px 10px 0;padding:13px 14px;font-size:14px;color:#544629}
+.hint-card{overflow:hidden}
+@media(max-width:700px){.tool-grid{grid-template-columns:1fr}.event-steps>span{display:none}.event-steps{display:grid;grid-template-columns:1fr;gap:7px}}
+
+/* Accessible code and method text sizes for classroom projection. */
+.tool-card code{font-size:14px}
+.tool-card span{font-size:14px}
+.detail-inside pre,.hint-card pre{font-size:14px}
+.event-steps>div>span{font-size:14px}
+
